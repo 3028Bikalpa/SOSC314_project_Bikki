@@ -1,0 +1,28 @@
+{
+  "validation_accuracy": 0.9190998889740978,
+  "validation_f1": 0.9425365853658536,
+  "top_10_positive": [
+    "amazing",
+    "great",
+    "awesome",
+    "loved",
+    "cares",
+    "enjoyed",
+    "excellent",
+    "best",
+    "wonderful",
+    "fantastic"
+  ],
+  "top_10_negative": [
+    "unprofessional",
+    "vague",
+    "unorganized",
+    "condescending",
+    "awful",
+    "horrible",
+    "terrible",
+    "rude",
+    "avoid",
+    "worst"
+  ]
+}
