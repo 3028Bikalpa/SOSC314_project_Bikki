@@ -1,26 +1,26 @@
 {
-  "validation_accuracy": 0.9123353211166688,
-  "validation_f1": 0.9376429879910442,
+  "validation_accuracy": 0.9273066489635675,
+  "validation_f1": 0.9486659284345977,
   "top_10_positive": [
     "amaz",
     "great",
     "awesom",
-    "love",
     "best",
-    "fantast",
-    "gem",
+    "love",
     "easi",
+    "fantast",
+    "fun",
     "solid",
-    "fun"
+    "highli recommend"
   ],
   "top_10_negative": [
     "unclear",
-    "ridicul",
     "vagu",
-    "terribl",
     "unorgan",
-    "horribl",
+    "ridicul",
     "condescend",
+    "terribl",
+    "horribl",
     "rude",
     "avoid",
     "worst"
