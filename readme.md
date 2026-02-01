@@ -288,7 +288,7 @@ Using the selected configuration (TF-IDF with tuned vocabulary and n-gram settin
 - Both achieve essentially identical F1 (~0.948)
 
 **Model Comparison Visualization:**  
-(Run cell number 28 for the picture)
+![alt text](Images/model_comparison.png)
 
 ---
 
