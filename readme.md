@@ -25,6 +25,29 @@
     - [Logistic Regression](#logistic-regression)
     - [Naive Bayes](#naive-bayes)
   - [Project Goals](#project-goals)
+  - [Week 4: Model Implementation and Operationalization](#week-4-model-implementation-and-operationalization)
+    - [Operationalization of Key Concepts](#operationalization-of-key-concepts)
+      - [TF-IDF Representation](#tf-idf-representation)
+      - [Vocabulary Decisions (What counts as a “feature”?)](#vocabulary-decisions-what-counts-as-a-feature)
+      - [Domain Stopwords](#domain-stopwords)
+    - [Controlled Experiments: How Preprocessing Choices Affect Results](#controlled-experiments-how-preprocessing-choices-affect-results)
+      - [Experiment 1: Effect of Domain Stopwords](#experiment-1-effect-of-domain-stopwords)
+      - [Experiment 2: Vocabulary Size Comparison](#experiment-2-vocabulary-size-comparison)
+      - [Experiment 3: N-grams (Unigrams vs Unigrams+Bigrams)](#experiment-3-n-grams-unigrams-vs-unigramsbigrams)
+      - [Experiment 4: Effect of Stemming](#experiment-4-effect-of-stemming)
+  - [Final Model Training: Logistic Regression vs Naive Bayes](#final-model-training-logistic-regression-vs-naive-bayes)
+    - [Model 1: Logistic Regression](#model-1-logistic-regression)
+    - [Model 2: Naive Bayes](#model-2-naive-bayes)
+    - [Model Comparison (Key Takeaways)](#model-comparison-key-takeaways)
+  - [Confusion Matrix Analysis](#confusion-matrix-analysis)
+  - [Feature Importance and Substantive Interpretation](#feature-importance-and-substantive-interpretation)
+    - [Logistic Regression: Top Predictive Words (Examples)](#logistic-regression-top-predictive-words-examples)
+    - [Naive Bayes: Phrase-Level Predictors (Examples)](#naive-bayes-phrase-level-predictors-examples)
+  - [Actionable Insights for Instructors](#actionable-insights-for-instructors)
+    - [What Drives Positive Reviews](#what-drives-positive-reviews)
+    - [What Drives Negative Reviews](#what-drives-negative-reviews)
+  - [Saving Models and Results](#saving-models-and-results)
+
 
 ### Author
 **Bikalpa Panthi**
@@ -105,7 +128,7 @@ This section summarizes key descriptive patterns observed in the cleaned dataset
 
 Positive reviews tend to be **longer** than negative reviews, suggesting that satisfied students provide more detailed feedback.
 
-![alt text](image.png)
+![alt text](Images/image.png)
 ---
 
 ### Word Frequency Patterns
@@ -113,14 +136,14 @@ Positive reviews tend to be **longer** than negative reviews, suggesting that sa
 Distinct word usage patterns emerge across sentiments.  
 Positive reviews frequently include words such as *easy*, *helpful*, *clear*, and *great*, while negative reviews more often include terms like *hard*, *exam*, *confusing*, and *grade*.
 
-![alt text](image-1.png)
+![alt text](Images/image-1.png)
 ---
 
 ### Rating Trends Over Time
 
 The proportion of positive versus negative reviews remains relatively stable across years. More recent years show greater consistency due to higher data volume.
 
-![alt text](image-2.png)
+![alt text](Images/image-2.png)
 ---
 
 ### Class Imbalance
@@ -128,7 +151,7 @@ The proportion of positive versus negative reviews remains relatively stable acr
 The dataset is highly imbalanced, with substantially more positive than negative reviews.  
 There are approximately **2.62 positive reviews for every negative review**, which presents a modeling challenge.
 
-![alt text](image-3.png)
+![alt text](Images/image-3.png)
 
 ---
 
@@ -154,5 +177,182 @@ The data will be split into **training, validation, and test sets**, using strat
 - Identify instructional insights embedded in student comments  
 - Demonstrate how text can supplement numerical evaluations  
 - Connect subjective student feedback to measurable outcomes using text as data  
+
+---
+
+## Week 4: Model Implementation and Operationalization
+
+This week implements and evaluates supervised learning models to classify **student review sentiment** from text, with a focus on how different **operationalization and preprocessing decisions** change model performance.
+
+---
+
+### Operationalization of Key Concepts
+
+#### TF-IDF Representation
+To convert text into model-ready numeric features, reviews are represented using **TF-IDF (Term Frequency–Inverse Document Frequency)**:
+- **TF** increases weight for terms that appear often in a given review
+- **IDF** downweights terms that appear in many reviews overall (e.g., generic words like “professor”)
+- This helps surface more **sentiment-distinguishing** words rather than universally common terms
+
+#### Vocabulary Decisions (What counts as a “feature”?)
+Key vectorizer choices tested and tuned:
+- `max_features` to cap vocabulary size and reduce overfitting/noise
+- `min_df` to remove extremely rare words (typos, one-offs)
+- `max_df` to remove ultra-common words
+- `ngram_range` to include phrases (e.g., “not helpful”) in addition to single words
+
+#### Domain Stopwords
+In addition to standard stopwords, a domain-specific list of common course-related words (e.g., “class”, “professor”) was tested to see whether removing them improves signal.
+
+---
+
+### Controlled Experiments: How Preprocessing Choices Affect Results
+
+We ran controlled experiments comparing **Logistic Regression (LR)** and **Naive Bayes (NB)** under different preprocessing/feature configurations.
+
+#### Experiment 1: Effect of Domain Stopwords
+- **Standard stopwords only**
+  - LR: Accuracy **0.9345**, F1 **0.9538**
+  - NB: Accuracy **0.9307**, F1 **0.9533**
+- **Standard + domain stopwords**
+  - LR: Accuracy **0.9265**, F1 **0.9480**
+  - NB: Accuracy **0.9230**, F1 **0.9482**
+
+**Result:** Removing domain stopwords slightly *reduced* accuracy/F1 in this setup (LR accuracy −0.0080; NB accuracy −0.0078).
+
+#### Experiment 2: Vocabulary Size Comparison
+- **5,000 features**
+  - LR: Accuracy **0.9216**, F1 **0.9444**
+  - NB: Accuracy **0.9176**, F1 **0.9448**
+- **Larger vocabulary setting (as run in notebook)**
+  - LR: Accuracy **0.9265**, F1 **0.9480**
+  - NB: Accuracy **0.9230**, F1 **0.9482**
+
+**Result:** A larger vocabulary improved both models modestly.
+
+#### Experiment 3: N-grams (Unigrams vs Unigrams+Bigrams)
+- **Unigrams only (1,1)**
+  - LR: Accuracy **0.9201**, F1 **0.9433**
+  - NB: Accuracy **0.9073**, F1 **0.9388**
+- **Unigrams + bigrams (1,2)**
+  - LR: Accuracy **0.9265**, F1 **0.9480**
+  - NB: Accuracy **0.9230**, F1 **0.9482**
+
+**Result:** Adding bigrams helped both models—especially Naive Bayes—by capturing phrase-level sentiment (e.g., “not good”, “very helpful”).
+
+#### Experiment 4: Effect of Stemming
+- **Without stemming**
+  - LR: Accuracy **0.9265**, F1 **0.9480**
+  - NB: Accuracy **0.9230**, F1 **0.9482**
+- **With stemming**
+  - LR: Accuracy **0.9248**, F1 **0.9468**
+  - NB: Accuracy **0.9222**, F1 **0.9477**
+
+**Result:** Stemming slightly reduced performance and can reduce interpretability.
+
+**Controlled Experiments Summary Figure:**  
+![alt text](Images/bar-image.png)
+
+---
+
+## Final Model Training: Logistic Regression vs Naive Bayes
+
+Using the selected configuration (TF-IDF with tuned vocabulary and n-gram settings), we trained two final models.
+
+### Model 1: Logistic Regression
+**Validation Results**
+- Accuracy: **0.9268**
+- Precision (Positive): **0.9711**
+- Recall (Positive): **0.9264**
+- F1: **0.9482**
+
+**Why LR?**
+- Highly interpretable via coefficients (word-level contributions)
+- Handles high-dimensional sparse text features well
+- Can address imbalance (e.g., via class weighting)
+
+### Model 2: Naive Bayes
+**Validation Results**
+- Accuracy: **0.9230**
+- Precision (Positive): **0.9234**
+- Recall (Positive): **0.9744**
+- F1: **0.9482**
+
+**Why NB?**
+- Fast and strong baseline for text classification
+- Often effective despite independence assumptions
+
+### Model Comparison (Key Takeaways)
+- LR has **higher precision** (fewer false positives)
+- NB has **higher recall** for positive class (fewer false negatives)
+- Both achieve essentially identical F1 (~0.948)
+
+**Model Comparison Visualization:**  
+(Run cell number 28 for the picture)
+
+---
+
+## Confusion Matrix Analysis
+
+**Logistic Regression**
+- True Negatives: **22,421**
+- False Positives: **1,743**
+- False Negatives: **4,651**
+- True Positives: **58,552**
+
+**Naive Bayes**
+- True Negatives: **19,053**
+- False Positives: **5,111**
+- False Negatives: **1,620**
+- True Positives: **61,583**
+
+**Confusion Matrices Figure:**  
+![alt text](Images/confusion_matrix_comparison.png)
+
+---
+
+## Feature Importance and Substantive Interpretation
+
+### Logistic Regression: Top Predictive Words (Examples)
+
+**Strong positive predictors include:**  
+`amazing`, `great`, `awesome`, `loved`, `cares`, `excellent`, `easy`, `wonderful`, `helped`, `fun`
+
+**Strong negative predictors include:**  
+`confusing`, `useless`, `unclear`, `poor`, `unprofessional`, `disorganized`, `awful`, `horrible`, `rude`, `avoid`, `worst`
+
+### Naive Bayes: Phrase-Level Predictors (Examples)
+
+**Positive predictors include phrases like:**  
+`best professors`, `truly cares`, `wont regret`, `absolutely loved`, `genuinely cares`
+
+**Negative predictors include phrases like:**  
+`avoid taking`, `hands worst`, `worst experience`, `extremely rude`, `literally worst`
+
+**Top Predictive Words Visualization:**  
+![alt text](Images/actionable_feedback.png)
+
+---
+
+## Actionable Insights for Instructors
+
+### What Drives Positive Reviews
+1. **Demonstrate care/support** (approachability, responsiveness, willingness to help)
+2. **Provide structure and clarity** (organized pacing, clear expectations)
+3. **Make content accessible** (explanations that reduce confusion)
+
+### What Drives Negative Reviews
+1. **Avoid interpersonal conflict signals** (e.g., “rude”, “condescending”, “unprofessional”)
+2. **Reduce disorganization** (clear materials, consistent grading/communication)
+3. **Minimize confusion** (tighten explanations and course structure)
+
+---
+
+## Saving Models and Results
+
+To support reproducibility and later deployment/testing:
+- Saved Logistic Regression model (`model_lr.pkl`)
+- Saved Naive Bayes model (`model_nb.pkl`)
+- Saved feature importance tables for both models (CSV)
 
 ---
