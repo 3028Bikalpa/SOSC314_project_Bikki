@@ -251,7 +251,7 @@ We ran controlled experiments comparing **Logistic Regression (LR)** and **Naive
 **Result:** Stemming slightly reduced performance and can reduce interpretability.
 
 **Controlled Experiments Summary Figure:**  
-![alt text](Images/bar-image.png)
+![alt text](Images/controlled_experiments.png)
 
 ---
 
