@@ -68,6 +68,7 @@
   - [Week 5 Takeaways](#week-5-takeaways)
 
 
+
 ### Author
 **Bikalpa Panthi**
 
@@ -482,9 +483,6 @@ We run three robustness checks:
 - **Small standard deviations** across folds → stable performance
 - Consistent ranking (LR vs NB) → conclusions do not depend on a specific split
 
-![alt text](Images/robustness_cross_validation.png)
-
-> Note: ROC-AUC scoring was attempted during CV, but the notebook run encountered a scoring configuration/version mismatch; the core metrics (Accuracy, Precision, Recall, F1) still provide a strong robustness check.
 
 ---
 
@@ -513,7 +511,6 @@ We run three robustness checks:
 **Interpretation:**
 - Accuracy/F1 remain very similar across “time” splits → limited evidence of strong drift in this simulated setup.
 
-![alt text](Images/robustness_temporal_validation.png)
 
 ---
 
@@ -537,8 +534,6 @@ We run three robustness checks:
 **Interpretation:**
 - Both models improve with more data, but gains diminish as sample size grows.
 - LR remains slightly better overall, though the gap is small.
-
-![alt text](Images/robustness_sample_size_sensitivity.png)
 
 ---
 
