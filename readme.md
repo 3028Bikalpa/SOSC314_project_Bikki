@@ -47,6 +47,25 @@
     - [What Drives Positive Reviews](#what-drives-positive-reviews)
     - [What Drives Negative Reviews](#what-drives-negative-reviews)
   - [Saving Models and Results](#saving-models-and-results)
+  - [Week 5: Diagnostics, Robustness \& Validity](#week-5-diagnostics-robustness--validity)
+  - [Feature Stability Analysis](#feature-stability-analysis)
+    - [1) K-Fold Feature Importance](#1-k-fold-feature-importance)
+    - [2) Bootstrap Coefficient Stability](#2-bootstrap-coefficient-stability)
+    - [Feature Stability Summary](#feature-stability-summary)
+  - [Robustness Checks](#robustness-checks)
+    - [1) Cross-Validation Robustness](#1-cross-validation-robustness)
+    - [2) Temporal Validation (Sequential Split Simulation)](#2-temporal-validation-sequential-split-simulation)
+    - [3) Sample Size Sensitivity](#3-sample-size-sensitivity)
+  - [Classification Diagnostics](#classification-diagnostics)
+    - [1) Calibration Curves](#1-calibration-curves)
+    - [2) ROC Curves and AUC](#2-roc-curves-and-auc)
+    - [3) Precision–Recall Curves](#3-precisionrecall-curves)
+    - [Classification Diagnostics Summary](#classification-diagnostics-summary)
+  - [Error Analysis](#error-analysis)
+    - [1) Error Type Categorization](#1-error-type-categorization)
+    - [2) Confidence Analysis](#2-confidence-analysis)
+    - [3) Example Misclassifications (Qualitative)](#3-example-misclassifications-qualitative)
+  - [Week 5 Takeaways](#week-5-takeaways)
 
 
 ### Author
@@ -354,5 +373,299 @@ To support reproducibility and later deployment/testing:
 - Saved Logistic Regression model (`model_lr.pkl`)
 - Saved Naive Bayes model (`model_nb.pkl`)
 - Saved feature importance tables for both models (CSV)
+
+---
+---
+
+## Week 5: Diagnostics, Robustness & Validity
+
+After training the final Logistic Regression (LR) and Naive Bayes (NB) models, we run a set of **diagnostics and robustness checks** to answer:
+
+- Are the model’s “important words” stable, or do they change a lot depending on the sample?
+- Do results hold up across different train/test splits (robustness)?
+- Are predicted probabilities trustworthy (calibration)?
+- Where do the models fail, and what kinds of text cause misclassifications?
+
+---
+
+## Feature Stability Analysis
+
+Feature stability asks whether the model’s most important features (words/phrases) remain important **across different samples of the data**. If “top words” change drastically from run to run, interpretation becomes less reliable and may indicate overfitting.
+
+We assess stability with two complementary methods:
+
+1. **K-Fold Feature Importance (Coefficient Stability Across Folds)**
+2. **Bootstrap Coefficient Stability (Resampling-Based Confidence Intervals)**
+
+---
+
+### 1) K-Fold Feature Importance
+
+**Goal:** Check whether the same features keep appearing as “top predictors” across different train/test splits.
+
+**Approach (Conceptually):**
+- Split training data into *k* folds.
+- Train LR on each fold.
+- Track each feature’s coefficient across folds.
+- Compute:
+  - **Mean coefficient** (average effect)
+  - **Std dev** across folds (variability)
+  - **Coefficient of Variation (CV = std/mean)** as a stability measure
+  - **Stability score** = how often a feature appears in the **Top-K** features across folds
+
+**Interpretation:**
+- **High stability score** + **low CV** → consistently important feature
+- **Low stability score** or **high CV** → feature importance depends on the split (less reliable)
+
+![alt text](Images/feature_stability_kfold.png)
+
+---
+
+### 2) Bootstrap Coefficient Stability
+
+**Goal:** Quantify uncertainty in feature coefficients by repeatedly retraining the model on resampled datasets.
+
+**Approach (Conceptually):**
+- Draw many bootstrap samples (sample with replacement).
+- Train LR on each bootstrap sample.
+- For each feature, summarize the coefficient distribution:
+  - **Median coefficient**
+  - **95% CI width** (narrow = stable)
+  - **Sign consistency** (% of runs where coefficient stays positive/negative)
+  - Whether the **CI includes 0** (suggesting uncertain direction)
+
+**Interpretation:**
+- **Narrow CI** + **high sign consistency** → reliable directional effect
+- **Wide CI** or **CI includes 0** → unstable or weakly identified feature
+
+![alt text](Images/feature_stability_bootstrap.png)
+
+---
+
+### Feature Stability Summary
+
+| Method | Stability Measure | What It Tells Us | What “Good” Looks Like |
+|-------|-------------------|------------------|-------------------------|
+| K-Fold CV | Stability score | How often a feature appears in Top-K | Higher (e.g., ≥ 0.60) |
+| K-Fold CV | Coefficient of Variation (CV) | Fold-to-fold coefficient volatility | Lower is better |
+| Bootstrap | 95% CI width | Uncertainty in coefficient estimate | Narrower is better |
+| Bootstrap | Sign consistency | Confidence in direction (±) | High (e.g., ≥ 95%) |
+| Bootstrap | CI includes 0 | Whether effect direction is ambiguous | Prefer “No” |
+
+**Key takeaway:** Features that are stable in *both* K-fold and bootstrap analyses are the most defensible for substantive interpretation.
+
+![alt text](Images/feature_stability_comparison.png)
+
+---
+
+## Robustness Checks
+
+Robustness checks test whether model performance is **consistent** under different evaluation conditions, rather than being an artifact of a single split or sampling decision.
+
+We run three robustness checks:
+
+1. **Cross-Validation Robustness**
+2. **Temporal Validation (Sequential Split Simulation)**
+3. **Sample Size Sensitivity**
+
+---
+
+### 1) Cross-Validation Robustness
+
+**Goal:** Ensure performance is not dependent on one particular train/validation split.
+
+**Approach (Conceptually):**
+- Use **stratified k-fold cross-validation** to keep class ratios consistent per fold.
+- Compute metrics across folds (mean ± std).
+
+**What we look for:**
+- **Small standard deviations** across folds → stable performance
+- Consistent ranking (LR vs NB) → conclusions do not depend on a specific split
+
+![alt text](Images/robustness_cross_validation.png)
+
+> Note: ROC-AUC scoring was attempted during CV, but the notebook run encountered a scoring configuration/version mismatch; the core metrics (Accuracy, Precision, Recall, F1) still provide a strong robustness check.
+
+---
+
+### 2) Temporal Validation (Sequential Split Simulation)
+
+**Goal:** Test whether models trained on “earlier” data maintain performance on “later” data (deployment-like behavior).
+
+**Important limitation:** The dataset does not provide reliable date features in the modeling table used here, so we **simulate** temporal drift by splitting the dataset in sequential order.
+
+**Approach (Conceptually):**
+- Split the data into:
+  - **Early period (60%)**
+  - **Middle period (20%)**
+  - **Recent period (20%)**
+- Evaluate scenarios like Early → Recent and Early+Middle → Recent.
+
+**Results Summary (as reported by the notebook):**
+
+| Train Period | Test Period | LR Accuracy | LR F1 | NB Accuracy | NB F1 |
+|------------|-------------|------------:|------:|------------:|------:|
+| Early (60%) | Middle (20%) | 0.9265 | 0.9277 | 0.9221 | 0.9201 |
+| Early (60%) | Recent (20%) | 0.9271 | 0.9282 | 0.9232 | 0.9211 |
+| Early+Middle (80%) | Recent (20%) | 0.9283 | 0.9294 | 0.9230 | 0.9210 |
+| Standard Train | Standard Val | 0.9268 | 0.9280 | 0.9230 | 0.9210 |
+
+**Interpretation:**
+- Accuracy/F1 remain very similar across “time” splits → limited evidence of strong drift in this simulated setup.
+
+![alt text](Images/robustness_temporal_validation.png)
+
+---
+
+### 3) Sample Size Sensitivity
+
+**Goal:** Understand how much training data we need before performance saturates.
+
+**Approach (Conceptually):**
+- Train models on increasing fractions of the training set (10%, 25%, 50%, 100%).
+- Evaluate on a fixed validation set.
+
+**Results Summary (as reported by the notebook):**
+
+| Training % | N Samples | LR Acc | LR F1 | NB Acc | NB F1 | LR − NB Gap |
+|----------:|----------:|------:|-----:|------:|-----:|------------:|
+| 10%  | 26,210  | 0.9133 | 0.9149 | 0.9098 | 0.9058 | 0.0035 |
+| 25%  | 65,525  | 0.9194 | 0.9208 | 0.9190 | 0.9165 | 0.0003 |
+| 50%  | 131,050 | 0.9232 | 0.9245 | 0.9216 | 0.9195 | 0.0016 |
+| 100% | 262,101 | 0.9268 | 0.9280 | 0.9230 | 0.9210 | 0.0039 |
+
+**Interpretation:**
+- Both models improve with more data, but gains diminish as sample size grows.
+- LR remains slightly better overall, though the gap is small.
+
+![alt text](Images/robustness_sample_size_sensitivity.png)
+
+---
+
+## Classification Diagnostics
+
+These diagnostics evaluate model behavior **beyond accuracy**, especially important for imbalanced datasets.
+
+We focus on:
+1. **Calibration curves** (probabilities match real-world frequencies)
+2. **ROC curves / AUC** (overall ranking/separation ability)
+3. **Precision–Recall curves / AP** (positive-class performance under imbalance)
+
+---
+
+### 1) Calibration Curves
+
+**What it checks:** If the model predicts a review has 0.80 probability of being positive, then roughly **80%** of those should actually be positive.
+
+**Why it matters:** Calibrated probabilities are crucial if predictions are used for downstream decisions (e.g., triaging reviews for follow-up).
+
+![alt text](Images/calibration_curves.png)
+
+---
+
+### 2) ROC Curves and AUC
+
+**What it shows:** Tradeoff between:
+- **True Positive Rate (Recall/Sensitivity)**
+- **False Positive Rate**
+
+**AUC** summarizes the ROC curve (1.0 = perfect, 0.5 = random).
+
+![alt text](Images/roc_curves.png)
+
+---
+
+### 3) Precision–Recall Curves
+
+Because the dataset is imbalanced, **PR curves** provide a clearer view of minority-class behavior than ROC curves.
+
+**Average Precision (AP)** summarizes the PR curve; higher is better.
+
+![alt text](Images/precision_recall_curves.png)
+
+---
+
+### Classification Diagnostics Summary
+
+| Diagnostic | What It Reveals | Why It Matters |
+|------------|-----------------|----------------|
+| Calibration | Reliability of predicted probabilities | Needed for probability-based decisions |
+| ROC-AUC | Overall discrimination ability | Threshold-independent comparison |
+| Precision–Recall | Positive-class performance under imbalance | Better indicator under class imbalance |
+
+**Key takeaway:** These plots help validate that model performance is not only “accurate,” but also useful and interpretable in decision settings.
+
+---
+
+## Error Analysis
+
+To understand model limitations, we analyze misclassifications and group them into **interpretable error categories**.
+
+### 1) Error Type Categorization
+
+We categorize misclassified reviews into patterns such as:
+- **Negation** (e.g., “not great”, “not that amazing…”)
+- **Sarcasm** (tone mismatch; hard for bag-of-words models)
+- **Mixed sentiment** (both positive and negative cues)
+- **Other** (remaining errors that do not match the above)
+
+**Error Distribution (as reported by the notebook):**
+
+**Logistic Regression**
+- Total errors: 6,394  
+- Other: 3,160 (49.4%)  
+- Negation: 2,852 (44.6%)  
+- Sarcasm: 470 (7.4%)  
+- Mixed sentiment: 386 (6.0%)
+
+**Naive Bayes**
+- Total errors: 6,731  
+- Negation: 3,866 (57.4%)  
+- Other: 2,563 (38.1%)  
+- Sarcasm: 424 (6.3%)  
+- Mixed sentiment: 388 (5.8%)
+
+![alt text](Images/error_type_distribution.png)
+
+**Interpretation:**
+- Negation is a major failure mode for both models (especially NB), which is expected in bag-of-words/TF-IDF pipelines unless negation handling is explicitly modeled.
+
+---
+
+### 2) Confidence Analysis
+
+We compare **model confidence** on correct vs incorrect predictions to see whether errors tend to occur at low confidence (good) or high confidence (more concerning).
+
+**Reported by the notebook:**
+
+**Logistic Regression**
+- Correct predictions: mean confidence 0.924
+- Incorrect predictions: mean confidence 0.705
+
+**Naive Bayes**
+- Correct predictions: mean confidence 0.898
+- Incorrect predictions: mean confidence 0.675
+
+![alt text](Images/confidence_analysis.png)
+
+**Interpretation:**
+- Both models are generally less confident when they are wrong (a desirable pattern).
+- However, some high-confidence mistakes still occur, suggesting certain linguistic constructions can strongly mislead the models.
+
+---
+
+### 3) Example Misclassifications (Qualitative)
+
+We also inspect specific misclassified texts to understand *why* the model failed (commonly due to negation, irony, or mixed sentiment). These examples help interpret how sentiment cues appear in real student language and where the pipeline could be improved.
+
+
+---
+
+## Week 5 Takeaways
+
+1. **Interpretability is strongest for stable features** (supported by K-fold and bootstrap stability).
+2. **Performance is robust** across splits, simulated “temporal” scenarios, and sample sizes.
+3. **Diagnostics support trust in probability outputs**, but calibration/threshold selection matters for deployment-like use.
+4. **Negation and mixed sentiment** remain the most common error modes, motivating improvements like explicit negation handling or more contextual models.
 
 ---
