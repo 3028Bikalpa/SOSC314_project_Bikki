@@ -1,0 +1,4 @@
+limitation,why_it_matters,scope_boundary,mitigation_next_step
+Potential class imbalance and under-representation,Can inflate aggregate metrics while underperforming on minority cases,Findings are strongest for classes with adequate training samples,Report per-class metrics and evaluate re-sampling/cost-sensitive learning
+Data is observational and context-specific,Limits causal claims and out-of-context generalization,"Interpret conclusions as predictive associations, not causal effects",Validate on external or temporally shifted holdout data
+Model tuning search budget is finite,Global optimum may not be reached,Best model is conditional on tested algorithms and hyperparameter ranges,Expand search space only if expected gain justifies compute cost
