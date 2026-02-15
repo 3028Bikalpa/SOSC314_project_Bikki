@@ -725,6 +725,10 @@ Negative sentiment clusters around interpersonal conflict, disorganization, and 
 - Temporal validation maintained accuracy around **0.927** across sequential splits
 - Sample-size sensitivity showed **0.913 accuracy at just 10%** of training data
 - These patterns indicate the findings are robust rather than artifacts of a particular data partition
+- 
+![alt text](Images/model_comparison.png)
+
+*Fig 1: Final Model Comparison – Performance Metrics and Normalized Confusion Matrices (LR vs NB)*
 
 **Answering the research question:**
 Text reviews surface relational and organizational dimensions of teaching quality — particularly instructor care, accessibility, and course structure — that a numerical rating collapses into a single score. The model identifies *which specific aspects* of teaching drive student satisfaction or dissatisfaction, providing actionable detail that aggregate scores cannot.
