@@ -66,6 +66,14 @@
     - [2) Confidence Analysis](#2-confidence-analysis)
     - [3) Example Misclassifications (Qualitative)](#3-example-misclassifications-qualitative)
   - [Week 5 Takeaways](#week-5-takeaways)
+  - [Week 6: Synthesis \& Communication Readiness](#week-6-synthesis--communication-readiness)
+    - [Final Analytic Configuration and Stopping Justification](#final-analytic-configuration-and-stopping-justification)
+    - [Substantive Interpretation of Results](#substantive-interpretation-of-results)
+    - [Limitations and Scope](#limitations-and-scope)
+    - [Draft Presentation Figures](#draft-presentation-figures)
+    - [GitHub Repository and Reproducibility](#github-repository-and-reproducibility)
+  - [Week 6 Takeaways](#week-6-takeaways)
+
 
 
 
@@ -662,5 +670,116 @@ We also inspect specific misclassified texts to understand *why* the model faile
 2. **Performance is robust** across splits, simulated “temporal” scenarios, and sample sizes.
 3. **Diagnostics support trust in probability outputs**, but calibration/threshold selection matters for deployment-like use.
 4. **Negation and mixed sentiment** remain the most common error modes, motivating improvements like explicit negation handling or more contextual models.
+
+---
+## Week 6: Synthesis & Communication Readiness
+
+This week finalizes the analytic pipeline, synthesizes results from Weeks 4–5, interprets findings in light of the research question, documents limitations and scope, and prepares the repository and figures for the final presentation.
+
+---
+
+### Final Analytic Configuration and Stopping Justification
+
+The final model is a **Logistic Regression** classifier with the following configuration:
+
+| Parameter | Value |
+|-----------|-------|
+| Feature representation | TF-IDF |
+| Max features | 10,000 |
+| N-gram range | (1, 2) — unigrams + bigrams |
+| Stopwords | Standard English + domain-specific |
+| Class weighting | `class_weight='balanced'` |
+| Regularization | C = 1.0 |
+| Solver | `liblinear` |
+
+**Why this configuration?**
+Week 4's controlled experiments showed that this combination consistently outperformed alternatives across all four preprocessing dimensions (domain stopwords, vocabulary size, n-gram range, and stemming). Naive Bayes was retained as a baseline comparator but did not exceed LR on any primary metric.
+
+**Stopping criterion:**
+> Cease model iteration when validation performance improvement is ≤ 0.005 for two consecutive model updates, or when additional complexity hurts generalization.
+
+This threshold was met after the LR vs NB comparison and the preprocessing ablations showed diminishing returns. The Week 6 code formalizes this by programmatically scanning the notebook for model objects and tracked metrics, then exporting the complete configuration and stopping rationale to `outputs/week6/final_analytic_configuration.json`.
+
+**Performance at stopping point:**
+
+| Metric | Logistic Regression | Naive Bayes |
+|--------|-------------------:|------------:|
+| Accuracy | 0.9268 | 0.9230 |
+| F1-Score | 0.9280 | 0.9210 |
+| ROC-AUC | ~0.97 | ~0.96 |
+
+---
+
+### Substantive Interpretation of Results
+
+Synthesizing across Weeks 4–6, the analysis confirms that open-text student reviews carry meaningful information that a single numerical rating cannot express.
+
+**What positive reviews reveal:**
+The Logistic Regression coefficients show that positive sentiment is driven by words signaling instructor care and approachability ("cares," "helped," "willing"), experiential quality ("amazing," "excellent"), and course structure. These patterns were confirmed as **stable** by Week 5's K-Fold and Bootstrap analyses — top predictive features maintained sign consistency above 95% and narrow confidence intervals across resamples.
+
+**What negative reviews reveal:**
+Negative sentiment clusters around interpersonal conflict, disorganization, and perceived unfairness. Both models agree on the core negative predictors, with high overlap in their top-50 feature lists.
+
+**Robustness of findings:**
+- Cross-validation showed **low variance** across 5 folds
+- Temporal validation maintained accuracy around **0.927** across sequential splits
+- Sample-size sensitivity showed **0.913 accuracy at just 10%** of training data
+- These patterns indicate the findings are robust rather than artifacts of a particular data partition
+
+**Answering the research question:**
+Text reviews surface relational and organizational dimensions of teaching quality — particularly instructor care, accessibility, and course structure — that a numerical rating collapses into a single score. The model identifies *which specific aspects* of teaching drive student satisfaction or dissatisfaction, providing actionable detail that aggregate scores cannot.
+
+---
+
+### Limitations and Scope
+
+| Limitation | Why It Matters | Scope Boundary | Mitigation / Next Step |
+|------------|---------------|----------------|----------------------|
+| Class imbalance (~2.6:1 positive-to-negative) | Can inflate aggregate metrics while masking minority-class underperformance | Findings are strongest for classes with adequate training samples | Report per-class metrics; evaluate re-sampling or cost-sensitive learning |
+| Observational, context-specific data | Limits causal claims and out-of-context generalization | Conclusions are predictive associations, not causal effects | Validate on external or temporally shifted holdout data |
+| Finite model search budget | Global optimum may not be reached | Best model is conditional on tested algorithms and hyperparameter ranges | Expand search space only if expected gain justifies compute cost |
+| No temporal metadata | Temporal validation relies on row-order as a proxy | Simulated temporal splits may not reflect true temporal drift | Collect or recover date information for future validation |
+| Negation-driven errors (44.6% of LR errors) | Signals a ceiling for bag-of-words models | Performance bound inherent to TF-IDF representation | Explore sequence-aware models or explicit negation handling |
+
+These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
+
+---
+
+### Draft Presentation Figures
+
+The Week 6 code generates presentation-ready draft figures conditionally based on available notebook variables:
+- **Core evaluation metrics** bar chart (when `metric_summary` is available)
+- **Confusion matrix** display (when `y_true` and `y_pred` are available)
+
+All figures are saved at **200 DPI** to `outputs/week6/figures/` for direct inclusion in the final presentation.
+
+---
+
+### GitHub Repository and Reproducibility
+
+The repository is now organized in near-final form:
+
+| Directory / File | Contents |
+|-----------------|----------|
+| `models.ipynb` | Complete pipeline: Week 4 (operationalization & training) → Week 5 (diagnostics & robustness) → Week 6 (synthesis & communication) |
+| `Assets/` | Processed data, saved models (`.pkl`), vectorizer, split indices, domain stopwords |
+| `outputs/week6/` | Final configuration JSON, limitations CSV, draft figures, reproducibility manifest |
+| `Images/` | All figures referenced in this README |
+
+**Reproducibility artifacts generated:**
+- `requirements_snapshot.txt` — full `pip freeze` of the runtime environment
+- `reproducibility_manifest.json` — artifact listing with Python version and platform details
+
+This ensures that any reviewer can clone the repository and reproduce results end to end.
+
+---
+
+## Week 6 Takeaways
+
+1. **Logistic Regression is the final selected model**, justified by consistent superiority over Naive Bayes across all preprocessing experiments and robustness checks.
+2. **The stopping criterion was met** — validation improvements fell below 0.005, and added complexity (stemming, larger vocabularies) did not meaningfully improve generalization.
+3. **Text reviews provide actionable pedagogical insight** beyond numerical ratings, surfacing specific relational and organizational factors that drive student sentiment.
+4. **Limitations are clearly scoped** — class imbalance, observational design, and negation-handling ceilings are documented with concrete mitigation paths.
+5. **The repository is reproducible** — environment snapshots, artifact manifests, and organized directory structure support independent replication.
 
 ---
