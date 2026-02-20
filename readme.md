@@ -54,7 +54,7 @@
     - [Feature Stability Summary](#feature-stability-summary)
   - [Robustness Checks](#robustness-checks)
     - [1) Cross-Validation Robustness](#1-cross-validation-robustness)
-    - [2) Temporal Validation (Sequential Split Simulation)](#2-temporal-validation-sequential-split-simulation)
+    - [2) Row-Order Validation (Sequential Split Simulation)](#2-row-order-validation-sequential-split-simulation)
     - [3) Sample Size Sensitivity](#3-sample-size-sensitivity)
   - [Classification Diagnostics](#classification-diagnostics)
     - [1) Calibration Curves](#1-calibration-curves)
@@ -474,7 +474,7 @@ Robustness checks test whether model performance is **consistent** under differe
 We run three robustness checks:
 
 1. **Cross-Validation Robustness**
-2. **Temporal Validation (Sequential Split Simulation)**
+2. **Row-Order Validation (Sequential Split Simulation)**
 3. **Sample Size Sensitivity**
 
 ---
@@ -494,11 +494,11 @@ We run three robustness checks:
 
 ---
 
-### 2) Temporal Validation (Sequential Split Simulation)
+### 2) Row-Order Validation (Sequential Split Simulation)
 
 **Goal:** Test whether models trained on “earlier” data maintain performance on “later” data (deployment-like behavior).
 
-**Important limitation:** The dataset does not provide reliable date features in the modeling table used here, so we **simulate** temporal drift by splitting the dataset in sequential order.
+**Important limitation:** The dataset does not provide reliable date features in the modeling table used here, so we **simulate distribution drift by splitting the dataset in sequential row order.
 
 **Approach (Conceptually):**
 - Split the data into:
@@ -667,7 +667,7 @@ We also inspect specific misclassified texts to understand *why* the model faile
 ## Week 5 Takeaways
 
 1. **Interpretability is strongest for stable features** (supported by K-fold and bootstrap stability).
-2. **Performance is robust** across splits, simulated “temporal” scenarios, and sample sizes.
+2. **Performance is robust** across splits, simulated row-order scenarios, and sample sizes.
 3. **Diagnostics support trust in probability outputs**, but calibration/threshold selection matters for deployment-like use.
 4. **Negation and mixed sentiment** remain the most common error modes, motivating improvements like explicit negation handling or more contextual models.
 
@@ -722,7 +722,7 @@ Negative sentiment clusters around interpersonal conflict, disorganization, and 
 
 **Robustness of findings:**
 - Cross-validation showed **low variance** across 5 folds
-- Temporal validation maintained accuracy around **0.927** across sequential splits
+- Row-order validation maintained accuracy around **0.927** across sequential splits
 - Sample-size sensitivity showed **0.913 accuracy at just 10%** of training data
 - These patterns indicate the findings are robust rather than artifacts of a particular data partition
 - 
@@ -742,7 +742,7 @@ Text reviews surface relational and organizational dimensions of teaching qualit
 | Class imbalance (~2.6:1 positive-to-negative) | Can inflate aggregate metrics while masking minority-class underperformance | Findings are strongest for classes with adequate training samples | Report per-class metrics; evaluate re-sampling or cost-sensitive learning |
 | Observational, context-specific data | Limits causal claims and out-of-context generalization | Conclusions are predictive associations, not causal effects | Validate on external or temporally shifted holdout data |
 | Finite model search budget | Global optimum may not be reached | Best model is conditional on tested algorithms and hyperparameter ranges | Expand search space only if expected gain justifies compute cost |
-| No temporal metadata | Temporal validation relies on row-order as a proxy | Simulated temporal splits may not reflect true temporal drift | Collect or recover date information for future validation |
+| No temporal metadata | Row-order validation relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future validation |
 | Negation-driven errors (44.6% of LR errors) | Signals a ceiling for bag-of-words models | Performance bound inherent to TF-IDF representation | Explore sequence-aware models or explicit negation handling |
 
 These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
