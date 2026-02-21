@@ -1,5 +1,8 @@
 section,content
-Research Question,[Add your exact research question here]
-Key Quantitative Result,No y_true/y_pred variables detected in scope.
-Substantive Interpretation,Translate the key metric into a domain implication (what does this mean for the target population/context?).
-Actionable Takeaway,State one decision that would change if this result is accepted.
+Research Question,"What information do open-text student reviews provide beyond numerical ratings, and can text analysis identify actionable feedback that ratings alone cannot capture?"
+Dependent Variable,"Binary sentiment Y: 1 for ratings {4,5}, 0 for ratings {1,2}; rating 3 excluded as neutral/ambiguous."
+Class Distribution,"Positive: 316,271 (72.4%); Negative: 120,565 (27.6%); N=436,836."
+Key Quantitative Result,"Final LR validation performance: Accuracy=0.9268, F1=0.9280 (README-reported)."
+Binary Coding Justification,Binary coding improves interpretability/actionability and reduces midpoint ambiguity; tradeoff is reduced granularity.
+Sensitivity Check,4-class NB sensitivity: weighted F1=0.6717 vs binary weighted F1=0.9210; substantive positive/negative language dimensions remain directionally consistent.
+Negation Experiment,Negation-aware LR improved validation F1 from 0.9482 to 0.9577 and reduced negation-tagged errors by 17.71%.

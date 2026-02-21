@@ -1,0 +1,12 @@
+{
+  "binary_nb_accuracy": 0.923,
+  "binary_nb_f1_weighted": 0.921,
+  "multiclass_nb_accuracy": 0.7372,
+  "multiclass_nb_f1_weighted": 0.6717,
+  "multiclass_labels": [
+    1,
+    2,
+    4,
+    5
+  ]
+}

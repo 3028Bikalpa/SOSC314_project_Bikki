@@ -129,10 +129,16 @@ Several preprocessing decisions were made to improve data quality and modeling p
 - Converted ratings from string to numeric format  
 
 ### Sentiment Construction
-- Constructed a **binary sentiment outcome**:
-  - **Positive**: ratings of 4 or 5  
-  - **Negative**: ratings of 1 or 2  
-- Removed neutral ratings of 3 to reduce label ambiguity  
+- Defined the dependent variable as **binary sentiment** \(Y\):
+  - `Y = 1 (Positive)`: ratings of 4 or 5  
+  - `Y = 0 (Negative)`: ratings of 1 or 2  
+- Excluded rating `3` as a neutral/ambiguous midpoint for the main binary task.
+- Final class distribution after filtering:
+  - Positive (`Y=1`): **316,271 / 436,836 (72.4%)**
+  - Negative (`Y=0`): **120,565 / 436,836 (27.6%)**
+
+**Why binary?**  
+Binary coding prioritizes interpretability and actionable polarity (clear positive vs negative instructional signals) and reduces midpoint ambiguity. The tradeoff is loss of rating granularity; to address this, we include a non-binary sensitivity check (4-class ratings: 1/2/4/5), reported in Week 6.
 
 ### Text Filtering and Normalization
 - Removed reviews with fewer than **5 words**  
@@ -691,9 +697,17 @@ The final model is a **Logistic Regression** classifier with the following confi
 | Class weighting | `class_weight='balanced'` |
 | Regularization | C = 1.0 |
 | Solver | `liblinear` |
+| Dependent variable | Binary sentiment \(Y\): `1` for ratings {4,5}, `0` for ratings {1,2}; rating `3` excluded |
+| Filtered class balance | 316,271 positive (72.4%) vs 120,565 negative (27.6%) |
 
 **Why this configuration?**
 Week 4's controlled experiments showed that this combination consistently outperformed alternatives across all four preprocessing dimensions (domain stopwords, vocabulary size, n-gram range, and stemming). Naive Bayes was retained as a baseline comparator but did not exceed LR on any primary metric.
+
+**Why binary coding for the dependent variable?**  
+The binary outcome is aligned with the project's interpretive goal (actionable positive vs negative teaching feedback), and it avoids neutral-label ambiguity. We explicitly acknowledge information loss from collapsing an ordered rating scale.
+
+**Sensitivity check (non-binary specification):**  
+A 4-class model (ratings 1/2/4/5) was run as a robustness check (`outputs/week6/sensitivity_multiclass_summary.json`). Substantive direction remained consistent (the same broad positive/negative language dimensions), though predictive performance dropped for the harder fine-grained task (`multiclass_nb_f1_weighted = 0.6717` vs binary `0.9210`), supporting the binary framing for this project's primary objective.
 
 **Stopping criterion:**
 > Cease model iteration when validation performance improvement is ≤ 0.005 for two consecutive model updates, or when additional complexity hurts generalization.
@@ -740,10 +754,11 @@ Text reviews surface relational and organizational dimensions of teaching qualit
 | Limitation | Why It Matters | Scope Boundary | Mitigation / Next Step |
 |------------|---------------|----------------|----------------------|
 | Class imbalance (~2.6:1 positive-to-negative) | Can inflate aggregate metrics while masking minority-class underperformance | Findings are strongest for classes with adequate training samples | Report per-class metrics; evaluate re-sampling or cost-sensitive learning |
-| Observational, context-specific data | Limits causal claims and out-of-context generalization | Conclusions are predictive associations, not causal effects | Validate on external or temporally shifted holdout data |
+| Causal inference limitation (observational data) | Unobserved confounding and selection effects can bias associational patterns | Coefficients are predictive associations, not causal effects | Use quasi-experimental or panel designs for causal claims |
+| External validity limitation (single platform context) | Model patterns may not transfer to other institutions/platforms | Findings are most credible for RateMyProfessors-like review settings | Validate on external datasets from other educational contexts |
 | Finite model search budget | Global optimum may not be reached | Best model is conditional on tested algorithms and hyperparameter ranges | Expand search space only if expected gain justifies compute cost |
 | No temporal metadata | Row-order validation relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future validation |
-| Negation-driven errors (44.6% of LR errors) | Signals a ceiling for bag-of-words models | Performance bound inherent to TF-IDF representation | Explore sequence-aware models or explicit negation handling |
+| Negation-driven errors in baseline TF-IDF | Negation flips sentiment polarity and creates high-confidence mistakes | Bag-of-words assumptions under-handle local token order | Added a negation-scope experiment (`not good -> NEG_good`) and compare against sequence-aware models next |
 
 These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
 
@@ -782,8 +797,10 @@ This ensures that any reviewer can clone the repository and reproduce results en
 
 1. **Logistic Regression is the final selected model**, justified by consistent superiority over Naive Bayes across all preprocessing experiments and robustness checks.
 2. **The stopping criterion was met** — validation improvements fell below 0.005, and added complexity (stemming, larger vocabularies) did not meaningfully improve generalization.
-3. **Text reviews provide actionable pedagogical insight** beyond numerical ratings, surfacing specific relational and organizational factors that drive student sentiment.
-4. **Limitations are clearly scoped** — class imbalance, observational design, and negation-handling ceilings are documented with concrete mitigation paths.
-5. **The repository is reproducible** — environment snapshots, artifact manifests, and organized directory structure support independent replication.
+3. **The dependent variable is now explicitly documented** and justified: binary coding supports interpretability while a 4-class sensitivity check captures the granularity tradeoff.
+4. **Negation-aware modeling improved results** in a controlled test (`F1: 0.9482 -> 0.9577`; negation-tagged errors reduced by 17.71%).
+5. **Text reviews provide actionable pedagogical insight** beyond numerical ratings, surfacing specific relational and organizational factors that drive student sentiment.
+6. **Limitations are clearly scoped** — class imbalance, causal inference limits, external validity constraints, and negation handling are separated with concrete mitigation paths.
+7. **The repository is reproducible** — environment snapshots, artifact manifests, and organized directory structure support independent replication.
 
 ---

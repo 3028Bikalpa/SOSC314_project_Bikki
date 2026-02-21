@@ -1,0 +1,13 @@
+{
+  "validation_n": 87367,
+  "negation_subset_n": 33060,
+  "baseline_accuracy": 0.9268,
+  "baseline_f1": 0.9482,
+  "negation_aware_accuracy": 0.9399,
+  "negation_aware_f1": 0.9577,
+  "delta_f1": 0.0095,
+  "baseline_negation_errors": 2852,
+  "negation_aware_negation_errors": 2347,
+  "negation_error_reduction_count": 505,
+  "negation_error_reduction_pct": 17.71
+}
