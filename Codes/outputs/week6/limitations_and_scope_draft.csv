@@ -1,6 +1,4 @@
 limitation,why_it_matters,scope_boundary,mitigation_next_step
 Potential class imbalance and under-representation,Can inflate aggregate metrics while underperforming on minority cases,Findings are strongest for classes with adequate training samples,Report per-class metrics and evaluate re-sampling/cost-sensitive learning
-Causal inference limitation (observational design),Unobserved confounding and selection effects limit causal identification,"Interpret coefficients as predictive associations, not causal effects",Use quasi-experimental/panel designs for causal claims
-External validity limitation (single-platform context),Patterns from RateMyProfessors may not transfer to all institutions/platforms,Generalization is strongest for similar review environments,Validate on external datasets from other educational settings
+Data is observational and context-specific,Limits causal claims and out-of-context generalization,"Interpret conclusions as predictive associations, not causal effects",Validate on external or temporally shifted holdout data
 Model tuning search budget is finite,Global optimum may not be reached,Best model is conditional on tested algorithms and hyperparameter ranges,Expand search space only if expected gain justifies compute cost
-Negation sensitivity in bag-of-words representation,Negation can invert polarity and create high-confidence mistakes,Standard TF-IDF features under-represent local word order effects,Negation-scope test improved F1 by 0.0095 and reduced negation-tagged errors by 17.71%.
