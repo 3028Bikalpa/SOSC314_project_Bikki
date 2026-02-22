@@ -504,7 +504,7 @@ We run three robustness checks:
 
 **Goal:** Test whether models trained on “earlier” data maintain performance on “later” data (deployment-like behavior).
 
-**Important limitation:** The dataset does not provide reliable date features in the modeling table used here, so we **simulate distribution drift by splitting the dataset in sequential row order.
+**Important limitation:** The dataset does not provide reliable date features in the modeling table used here, so we **simulate distribution drift by splitting the dataset in sequential row order**.
 
 **Approach (Conceptually):**
 - Split the data into:
@@ -758,7 +758,7 @@ Text reviews surface relational and organizational dimensions of teaching qualit
 | External validity limitation (single platform context) | Model patterns may not transfer to other institutions/platforms | Findings are most credible for RateMyProfessors-like review settings | Validate on external datasets from other educational contexts |
 | Finite model search budget | Global optimum may not be reached | Best model is conditional on tested algorithms and hyperparameter ranges | Expand search space only if expected gain justifies compute cost |
 | No temporal metadata | Row-order validation relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future validation |
-| Negation-driven errors in baseline TF-IDF | Negation flips sentiment polarity and creates high-confidence mistakes | Bag-of-words assumptions under-handle local token order | Added a negation-scope experiment (`not good -> NEG_good`) and compare against sequence-aware models next |
+| Negation-driven errors in baseline TF-IDF | Negation flips sentiment polarity and creates high-confidence mistakes | Bag-of-words assumptions under-handle local token order | Added a supplemental negation-scope experiment (`not good -> NEG_good`) in `Codes/final_code.ipynb` and compare against sequence-aware models next |
 
 These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
 
@@ -780,7 +780,7 @@ The repository is now organized in near-final form:
 
 | Directory / File | Contents |
 |-----------------|----------|
-| `models.ipynb` | Complete pipeline: Week 4 (operationalization & training) → Week 5 (diagnostics & robustness) → Week 6 (synthesis & communication) |
+| `Codes/models.ipynb` | Complete pipeline: Week 4 (operationalization & training) → Week 5 (diagnostics & robustness) → Week 6 (synthesis & communication) |
 | `Assets/` | Processed data, saved models (`.pkl`), vectorizer, split indices, domain stopwords |
 | `outputs/week6/` | Final configuration JSON, limitations CSV, draft figures, reproducibility manifest |
 | `Images/` | All figures referenced in this README |
@@ -798,7 +798,7 @@ This ensures that any reviewer can clone the repository and reproduce results en
 1. **Logistic Regression is the final selected model**, justified by consistent superiority over Naive Bayes across all preprocessing experiments and robustness checks.
 2. **The stopping criterion was met** — validation improvements fell below 0.005, and added complexity (stemming, larger vocabularies) did not meaningfully improve generalization.
 3. **The dependent variable is now explicitly documented** and justified: binary coding supports interpretability while a 4-class sensitivity check captures the granularity tradeoff.
-4. **Negation-aware modeling improved results** in a controlled test (`F1: 0.9482 -> 0.9577`; negation-tagged errors reduced by 17.71%).
+4. **Negation-aware modeling improved results** in a supplemental controlled test (`F1: 0.9482 -> 0.9577`; `delta_f1 = +0.0095`; negation-tagged errors reduced by 17.71%), reported from `Codes/final_code.ipynb` and saved in `Codes/outputs/week6/negation_experiment_summary.csv`.
 5. **Text reviews provide actionable pedagogical insight** beyond numerical ratings, surfacing specific relational and organizational factors that drive student sentiment.
 6. **Limitations are clearly scoped** — class imbalance, causal inference limits, external validity constraints, and negation handling are separated with concrete mitigation paths.
 7. **The repository is reproducible** — environment snapshots, artifact manifests, and organized directory structure support independent replication.
