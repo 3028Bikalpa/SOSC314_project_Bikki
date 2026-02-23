@@ -4,26 +4,26 @@
       {
         "config": "Standard stopwords only",
         "model": "Logistic Regression",
-        "accuracy": 0.9345290555930729,
-        "f1": 0.9537852468287954
+        "accuracy": 0.9357883572044471,
+        "f1": 0.954739814441307
       },
       {
         "config": "Standard stopwords only",
         "model": "Naive Bayes",
-        "accuracy": 0.9307404397541406,
-        "f1": 0.9532593330707019
+        "accuracy": 0.931698346445277,
+        "f1": 0.9539247126407199
       },
       {
         "config": "Standard + domain stopwords",
         "model": "Logistic Regression",
-        "accuracy": 0.9265168770817357,
-        "f1": 0.9480044058571984
+        "accuracy": 0.9287758201005716,
+        "f1": 0.9496824832077282
       },
       {
         "config": "Standard + domain stopwords",
         "model": "Naive Bayes",
-        "accuracy": 0.9229571806288416,
-        "f1": 0.9481820211398262
+        "accuracy": 0.9233046676484727,
+        "f1": 0.9484619605068172
       }
     ],
     "vocabulary_size": [
@@ -31,55 +31,55 @@
         "config": "5,000 features",
         "model": "Logistic Regression",
         "vocab_size": 5000,
-        "accuracy": 0.9216408941591219,
-        "f1": 0.9444273074113159
+        "accuracy": 0.9242661254015613,
+        "f1": 0.9463997364541198
       },
       {
         "config": "5,000 features",
         "model": "Naive Bayes",
         "vocab_size": 5000,
-        "accuracy": 0.9175546831183399,
-        "f1": 0.9447745516717908
+        "accuracy": 0.918024280623574,
+        "f1": 0.9451291454488807
       },
       {
         "config": "10,000 features",
         "model": "Logistic Regression",
         "vocab_size": 10000,
-        "accuracy": 0.9265168770817357,
-        "f1": 0.9480044058571984
+        "accuracy": 0.9287758201005716,
+        "f1": 0.9496824832077282
       },
       {
         "config": "10,000 features",
         "model": "Naive Bayes",
         "vocab_size": 10000,
-        "accuracy": 0.9229571806288416,
-        "f1": 0.9481820211398262
+        "accuracy": 0.9233046676484727,
+        "f1": 0.9484619605068172
       }
     ],
     "ngram_range": [
       {
         "config": "Unigrams only",
         "model": "Logistic Regression",
-        "accuracy": 0.9201185802419678,
-        "f1": 0.9432928959706186
+        "accuracy": 0.9212672928859756,
+        "f1": 0.9441781451865958
       },
       {
         "config": "Unigrams only",
         "model": "Naive Bayes",
-        "accuracy": 0.907321986562432,
-        "f1": 0.9388300886159145
+        "accuracy": 0.9065096794377762,
+        "f1": 0.9383658808970451
       },
       {
         "config": "Unigrams + Bigrams",
         "model": "Logistic Regression",
-        "accuracy": 0.9265168770817357,
-        "f1": 0.9480044058571984
+        "accuracy": 0.9287758201005716,
+        "f1": 0.9496824832077282
       },
       {
         "config": "Unigrams + Bigrams",
         "model": "Naive Bayes",
-        "accuracy": 0.9229571806288416,
-        "f1": 0.9481820211398262
+        "accuracy": 0.9233046676484727,
+        "f1": 0.9484619605068172
       }
     ],
     "stemming": [
@@ -87,44 +87,44 @@
         "config": "Without stemming",
         "model": "Logistic Regression",
         "vocab_size": 10000,
-        "accuracy": 0.9265168770817357,
-        "f1": 0.9480044058571984
+        "accuracy": 0.9287758201005716,
+        "f1": 0.9496824832077282
       },
       {
         "config": "Without stemming",
         "model": "Naive Bayes",
         "vocab_size": 10000,
-        "accuracy": 0.9229571806288416,
-        "f1": 0.9481820211398262
+        "accuracy": 0.9233046676484727,
+        "f1": 0.9484619605068172
       },
       {
         "config": "With stemming",
         "model": "Logistic Regression",
         "vocab_size": 10000,
-        "accuracy": 0.924811427655751,
-        "f1": 0.9468290906147557
+        "accuracy": 0.9262424552273543,
+        "f1": 0.9478764478764479
       },
       {
         "config": "With stemming",
         "model": "Naive Bayes",
         "vocab_size": 10000,
-        "accuracy": 0.9222246385935193,
-        "f1": 0.9477207155222158
+        "accuracy": 0.922022723977688,
+        "f1": 0.9476708162000789
       }
     ]
   },
   "model_comparison": {
     "logistic_regression": {
-      "accuracy": 0.9268144722835854,
-      "precision": 0.9710921303590679,
-      "recall": 0.9264117209626125,
-      "f1": 0.9482258822005215
+      "accuracy": 0.9291039366353557,
+      "precision": 0.9721737979124832,
+      "recall": 0.9286580031829345,
+      "f1": 0.9499177964046034
     },
     "naive_bayes": {
-      "accuracy": 0.9229571806288416,
-      "precision": 0.9233664197678951,
-      "recall": 0.9743683053019635,
-      "f1": 0.9481820211398262
+      "accuracy": 0.9233046676484727,
+      "precision": 0.9235570201717596,
+      "recall": 0.9747473150578092,
+      "f1": 0.9484619605068172
     }
   },
   "top_features": {
@@ -133,20 +133,20 @@
       "great",
       "awesome",
       "loved",
-      "cares",
       "enjoyed",
-      "excellent",
+      "cares",
       "best",
-      "easy",
-      "wonderful"
+      "excellent",
+      "fantastic",
+      "caring"
     ],
     "top_10_negative": [
       "disorganized",
       "teach",
       "unorganized",
       "condescending",
-      "awful",
       "horrible",
+      "awful",
       "terrible",
       "rude",
       "avoid",

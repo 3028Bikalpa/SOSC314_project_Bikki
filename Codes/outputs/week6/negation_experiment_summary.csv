@@ -1,2 +1,2 @@
-validation_n,negation_subset_n,baseline_accuracy,baseline_f1,negation_aware_accuracy,negation_aware_f1,delta_f1,baseline_negation_errors,negation_aware_negation_errors,negation_error_reduction_count,negation_error_reduction_pct
+test_n,negation_subset_n,baseline_accuracy,baseline_f1,negation_aware_accuracy,negation_aware_f1,delta_f1,baseline_negation_errors,negation_aware_negation_errors,negation_error_reduction_count,negation_error_reduction_pct
 87367,33060,0.9268,0.9482,0.9399,0.9577,0.0095,2852,2347,505,17.71

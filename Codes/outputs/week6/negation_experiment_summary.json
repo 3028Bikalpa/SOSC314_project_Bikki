@@ -1,5 +1,5 @@
 {
-  "validation_n": 87367,
+  "test_n": 87367,
   "negation_subset_n": 33060,
   "baseline_accuracy": 0.9268,
   "baseline_f1": 0.9482,

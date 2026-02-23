@@ -202,7 +202,7 @@ The following models will be implemented in later stages of the project.
 - Serves as a baseline comparison model  
 - Helps validate consistency across modeling approaches  
 
-The data will be split into **training, validation, and test sets**, using stratification to preserve class proportions.
+The data is split into **training and test sets** (70/30), using stratification to preserve class proportions.
 
 ---
 
@@ -487,7 +487,7 @@ We run three robustness checks:
 
 ### 1) Cross-Validation Robustness
 
-**Goal:** Ensure performance is not dependent on one particular train/validation split.
+**Goal:** Ensure performance is not dependent on one particular train/test split.
 
 **Approach (Conceptually):**
 - Use **stratified k-fold cross-validation** to keep class ratios consistent per fold.
@@ -534,7 +534,7 @@ We run three robustness checks:
 
 **Approach (Conceptually):**
 - Train models on increasing fractions of the training set (10%, 25%, 50%, 100%).
-- Evaluate on a fixed validation set.
+- Evaluate on a fixed test set.
 
 **Results Summary (as reported by the notebook):**
 
@@ -710,7 +710,7 @@ The binary outcome is aligned with the project's interpretive goal (actionable p
 A 4-class model (ratings 1/2/4/5) was run as a robustness check (`outputs/week6/sensitivity_multiclass_summary.json`). Substantive direction remained consistent (the same broad positive/negative language dimensions), though predictive performance dropped for the harder fine-grained task (`multiclass_nb_f1_weighted = 0.6717` vs binary `0.9210`), supporting the binary framing for this project's primary objective.
 
 **Stopping criterion:**
-> Cease model iteration when validation performance improvement is ≤ 0.005 for two consecutive model updates, or when additional complexity hurts generalization.
+> Cease model iteration when test performance improvement is ≤ 0.005 for two consecutive model updates, or when additional complexity hurts generalization.
 
 This threshold was met after the LR vs NB comparison and the preprocessing ablations showed diminishing returns. The Week 6 code formalizes this by programmatically scanning the notebook for model objects and tracked metrics, then exporting the complete configuration and stopping rationale to `outputs/week6/final_analytic_configuration.json`.
 
@@ -757,7 +757,7 @@ Text reviews surface relational and organizational dimensions of teaching qualit
 | Causal inference limitation (observational data) | Unobserved confounding and selection effects can bias associational patterns | Coefficients are predictive associations, not causal effects | Use quasi-experimental or panel designs for causal claims |
 | External validity limitation (single platform context) | Model patterns may not transfer to other institutions/platforms | Findings are most credible for RateMyProfessors-like review settings | Validate on external datasets from other educational contexts |
 | Finite model search budget | Global optimum may not be reached | Best model is conditional on tested algorithms and hyperparameter ranges | Expand search space only if expected gain justifies compute cost |
-| No temporal metadata | Row-order validation relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future validation |
+| No temporal metadata | Row-order testing relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future testing |
 | Negation-driven errors in baseline TF-IDF | Negation flips sentiment polarity and creates high-confidence mistakes | Bag-of-words assumptions under-handle local token order | Added a supplemental negation-scope experiment (`not good -> NEG_good`) in `Codes/final_code.ipynb` and compare against sequence-aware models next |
 
 These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
@@ -796,7 +796,7 @@ This ensures that any reviewer can clone the repository and reproduce results en
 ## Week 6 Takeaways
 
 1. **Logistic Regression is the final selected model**, justified by consistent superiority over Naive Bayes across all preprocessing experiments and robustness checks.
-2. **The stopping criterion was met** — validation improvements fell below 0.005, and added complexity (stemming, larger vocabularies) did not meaningfully improve generalization.
+2. **The stopping criterion was met** — test-set improvements fell below 0.005, and added complexity (stemming, larger vocabularies) did not meaningfully improve generalization.
 3. **The dependent variable is now explicitly documented** and justified: binary coding supports interpretability while a 4-class sensitivity check captures the granularity tradeoff.
 4. **Negation-aware modeling improved results** in a supplemental controlled test (`F1: 0.9482 -> 0.9577`; `delta_f1 = +0.0095`; negation-tagged errors reduced by 17.71%), reported from `Codes/final_code.ipynb` and saved in `Codes/outputs/week6/negation_experiment_summary.csv`.
 5. **Text reviews provide actionable pedagogical insight** beyond numerical ratings, surfacing specific relational and organizational factors that drive student sentiment.

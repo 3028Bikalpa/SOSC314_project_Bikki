@@ -1,10 +1,10 @@
 {
-  "created_at": "2026-02-22T19:51:39",
+  "created_at": "2026-02-23T22:03:23",
   "selected_model_variable": null,
   "selected_model_class": null,
   "selected_model_params": {},
   "stopping_justification": {
-    "criterion": "Stop model iteration when validation performance improvement is <= 0.005 for two consecutive model updates, or when additional complexity hurts generalization.",
-    "evidence": "No tracked validation metric variables were detected; use model comparison table already produced above."
+    "criterion": "Stop model iteration when test performance improvement is <= 0.005 for two consecutive model updates, or when additional complexity hurts generalization.",
+    "evidence": "No tracked test metric variables were detected; use model comparison table already produced above."
   }
 }
