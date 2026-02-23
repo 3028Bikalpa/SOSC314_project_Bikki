@@ -202,7 +202,8 @@ The following models will be implemented in later stages of the project.
 - Serves as a baseline comparison model  
 - Helps validate consistency across modeling approaches  
 
-The data is split into **training and test sets** (70/30), using stratification to preserve class proportions.
+The data is split into **training and test sets** (70/30), using stratification to preserve class proportions.  
+This 70/30 split is the active configuration used in the updated notebooks (`Codes/project_code.ipynb`, `Codes/models.ipynb`, and `Codes/final_code.ipynb`).
 
 ---
 
@@ -707,12 +708,12 @@ Week 4's controlled experiments showed that this combination consistently outper
 The binary outcome is aligned with the project's interpretive goal (actionable positive vs negative teaching feedback), and it avoids neutral-label ambiguity. We explicitly acknowledge information loss from collapsing an ordered rating scale.
 
 **Sensitivity check (non-binary specification):**  
-A 4-class model (ratings 1/2/4/5) was run as a robustness check (`outputs/week6/sensitivity_multiclass_summary.json`). Substantive direction remained consistent (the same broad positive/negative language dimensions), though predictive performance dropped for the harder fine-grained task (`multiclass_nb_f1_weighted = 0.6717` vs binary `0.9210`), supporting the binary framing for this project's primary objective.
+A 4-class model (ratings 1/2/4/5) was run as a robustness check (`Codes/outputs/week6/sensitivity_multiclass_summary.json`). Substantive direction remained consistent (the same broad positive/negative language dimensions), though predictive performance dropped for the harder fine-grained task (`multiclass_nb_f1_weighted = 0.6717` vs binary `0.9210`), supporting the binary framing for this project's primary objective.
 
 **Stopping criterion:**
 > Cease model iteration when test performance improvement is ≤ 0.005 for two consecutive model updates, or when additional complexity hurts generalization.
 
-This threshold was met after the LR vs NB comparison and the preprocessing ablations showed diminishing returns. The Week 6 code formalizes this by programmatically scanning the notebook for model objects and tracked metrics, then exporting the complete configuration and stopping rationale to `outputs/week6/final_analytic_configuration.json`.
+This threshold was met after the LR vs NB comparison and the preprocessing ablations showed diminishing returns. The Week 6 code formalizes this by programmatically scanning the notebook for model objects and tracked metrics, then exporting the complete configuration and stopping rationale to `Codes/outputs/week6/final_analytic_configuration.json`.
 
 **Performance at stopping point:**
 
@@ -760,7 +761,7 @@ Text reviews surface relational and organizational dimensions of teaching qualit
 | No temporal metadata | Row-order testing relies on row-order as a proxy | Simulated row-order splits may not reflect true temporal drift | Collect or recover date information for future testing |
 | Negation-driven errors in baseline TF-IDF | Negation flips sentiment polarity and creates high-confidence mistakes | Bag-of-words assumptions under-handle local token order | Added a supplemental negation-scope experiment (`not good -> NEG_good`) in `Codes/final_code.ipynb` and compare against sequence-aware models next |
 
-These limitations are also exported to `outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
+These limitations are also exported to `Codes/outputs/week6/limitations_and_scope_draft.csv` for transparency and future reference.
 
 ---
 
@@ -770,7 +771,7 @@ The Week 6 code generates presentation-ready draft figures conditionally based o
 - **Core evaluation metrics** bar chart (when `metric_summary` is available)
 - **Confusion matrix** display (when `y_true` and `y_pred` are available)
 
-All figures are saved at **200 DPI** to `outputs/week6/figures/` for direct inclusion in the final presentation.
+All figures are saved at **200 DPI** to `Codes/outputs/week6/figures/` for direct inclusion in the final presentation.
 
 ---
 
@@ -780,9 +781,11 @@ The repository is now organized in near-final form:
 
 | Directory / File | Contents |
 |-----------------|----------|
-| `Codes/models.ipynb` | Complete pipeline: Week 4 (operationalization & training) → Week 5 (diagnostics & robustness) → Week 6 (synthesis & communication) |
+| `Codes/project_code.ipynb` | Data construction, cleaning, EDA, and initial stratified 70/30 split setup |
+| `Codes/models.ipynb` | Main modeling notebook covering Week 4 (operationalization & training), Week 5 diagnostics, and Week 6 synthesis workflow |
+| `Codes/final_code.ipynb` | Final reporting notebook with consolidated narrative outputs and supplemental analyses (including negation experiment) |
 | `Assets/` | Processed data, saved models (`.pkl`), vectorizer, split indices, domain stopwords |
-| `outputs/week6/` | Final configuration JSON, limitations CSV, draft figures, reproducibility manifest |
+| `Codes/outputs/week6/` | Final configuration JSON, limitations CSV, draft figures, reproducibility manifest |
 | `Images/` | All figures referenced in this README |
 
 **Reproducibility artifacts generated:**
