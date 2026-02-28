@@ -160,15 +160,22 @@ SOSC314/
 │   ├── model_lr.pkl
 │   ├── model_nb.pkl
 │   └── vectorizer_tfidf.pkl
-├── Codes/                           # All notebooks
+├── Codes/                           # Notebooks and generated outputs
 │   ├── project_code.ipynb           # Data loading, cleaning, EDA
 │   ├── models.ipynb                 # Model exploration and tuning
 │   ├── final_code.ipynb             # Final pipeline: experiments, models, diagnostics
 │   └── outputs/week6/               # Generated figures and artifacts
-├── Images/                          # All figures used in the report
+├── Images/                          # Figures used in the README analysis
+├── Report Assets/                   # Report deliverables and report-only images
+│   ├── report.ipynb
+│   └── Report Images/
+│       ├── Weixin Image_2026-02-27_211106_542.png
+│       └── Weixin Image_2026-02-28_155512_265.png
+├── index.html                       # Published HTML report page (GitHub Pages entry)
+├── readme.md
+├── requirements.txt
 ├── .venv/                           # Python virtual environment
-├── .gitignore
-└── README.md
+└── .gitignore
 ```
 
 ---
